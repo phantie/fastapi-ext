@@ -14,8 +14,7 @@ Examples:
 
     class UserOut(BaseModel):
         username: str
-        email: EmailStr
-        full_name: Optional[str] # No need to write None
+        full_name: Optional[str] # No need to write `= None`
 
     class UserIn(UserOut):
         password: str
