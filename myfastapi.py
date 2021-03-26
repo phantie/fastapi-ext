@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 
+
 class MyFastAPIMeta(type):
     def __new__(cls, name, bases, attrs):
         meths = 'get post delete put patch options trace head'
@@ -9,10 +10,9 @@ class MyFastAPIMeta(type):
                 def wrap(self, path, **kwargs):
                     meth = getattr(super(self.__class__, self), meth_name)
                     def wrap(f):
-                        response_model = getattr(f, '__annotations__', {}).get('return', None)
-                        assert not 'response_model' in kwargs, \
-                            'define response_model in either place, not in both'
-                        return meth(path, response_model=response_model, **kwargs)(f)
+                        response_model = (
+                            getattr(f, '__annotations__', {}).get('return', kwargs.pop('response_model', None)))
+                        return meth(path, **kwargs, response_model=response_model)(f)
                     return wrap
                 return wrap
 
