@@ -2,7 +2,11 @@
 
 
 Examples:
+
+
 .. code:: python
+
+
     from mypydantic import Model as BaseModel
     from myfastapi import MyFastAPI
 
