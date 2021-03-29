@@ -14,7 +14,8 @@ Examples:
 
     class UserOut(BaseModel):
         username: str
-        items: List # equals to `items: List = []`
+        items: list # equals to `items: ... = []`
+        misc: tuple[str, int, bytes] # equals to `misc: ... = ('', 0, b'')`
 
     class UserIn(UserOut):
         password: str

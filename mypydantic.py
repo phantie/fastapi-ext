@@ -21,7 +21,7 @@ class BaseMeta(ModelMetaclass):
                 origin = value.__origin__
                 if origin is Union:
                     pass
-                elif origin is tuple and value.__args__:
+                elif origin is tuple:
                     attrs[key] = tuple(default() for default in value.__args__)
                 else:
                     attrs[key] = origin()
