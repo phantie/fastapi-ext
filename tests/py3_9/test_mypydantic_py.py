@@ -1,28 +1,25 @@
 from mypydantic import BaseModel
-
-from typing import *
-from collections import defaultdict, deque, OrderedDict as ordereddict
-
 import pytest
+
 
 def test_basic():
     class User(BaseModel):
         username: str
-        items: List[str]
-        misc: Tuple
+        items: list[str]
+        misc: tuple
 
     user = User(usename = 'phantie')
     assert user.items == [] and user.misc == ()
 
 def test_types():
-
+    from collections import deque, defaultdict, OrderedDict
     class Foo(BaseModel):
-        fs: FrozenSet
-        t: Tuple
-        l: List
-        d: Dict
-        dd: DefaultDict
-        dq: Deque
+        fs: frozenset
+        t: tuple
+        l: list
+        d: dict
+        dd: defaultdict
+        dq: deque
         od: OrderedDict
 
 
@@ -33,18 +30,19 @@ def test_types():
     assert a('d') == dict()
     assert a('dd') == defaultdict()
     assert a('dq') == deque()
-    assert a('od') == ordereddict()
+    assert a('od') == OrderedDict()
+
 
 def test_hinted_types():
     from collections import deque, defaultdict, OrderedDict
     class Foo(BaseModel):
-        fs: FrozenSet[int]
-        t: Tuple[int, str, bytes]
-        l: List[float]
-        d: Dict[str, int]
-        dd: DefaultDict[str, int]
-        dq: Deque[int]
-        # od: OrderedDict[str, float] # does not work with OrderedDict
+        fs: frozenset[int]
+        t: tuple[int, str, bytes]
+        l: list[float]
+        d: dict[str, int]
+        dd: defaultdict[str, int]
+        dq: deque[int]
+        od: OrderedDict[str, float]
 
 
     a = Foo().__getattribute__
@@ -54,3 +52,4 @@ def test_hinted_types():
     assert a('d') == dict()
     assert a('dd') == defaultdict()
     assert a('dq') == deque()
+    assert a('od') == OrderedDict()
