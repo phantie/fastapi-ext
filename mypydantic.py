@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel as PydanticBaseModel
 from pydantic.main import ModelMetaclass
 
 from typing import Union, Optional
@@ -13,6 +13,7 @@ class BaseMeta(ModelMetaclass):
     def __new__(cls, name, bases, attrs):
         annotations = attrs.get('__annotations__', {})
 
+
         for key in set(annotations).difference(set(attrs)):
             value = annotations[key]
 
@@ -25,6 +26,6 @@ class BaseMeta(ModelMetaclass):
             else:
                 attrs[key] = value()
 
-        return super().__new__(cls, cls.__name__, (BaseModel, object), attrs)
+        return super().__new__(cls, cls.__name__, (PydanticBaseModel, object), attrs)
 
-class Model(metaclass=BaseMeta): ...
+class BaseModel(metaclass=BaseMeta): ...
