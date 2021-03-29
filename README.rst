@@ -14,7 +14,7 @@ Examples:
 
     class UserOut(BaseModel):
         username: str
-        full_name: Optional[str] # No need to write `= None`
+        items: List # equals to `items: List = []`
 
     class UserIn(UserOut):
         password: str
