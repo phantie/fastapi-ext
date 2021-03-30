@@ -1,9 +1,9 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, APIRouter
 
-__all__ = ['MyFastAPI']
+__all__ = 'MyFastAPI', 'MyAPIRouter'
 
 
-class MyFastAPIMeta(type):
+class BaseAPIMeta(type):
     def __new__(cls, name, bases, attrs):
         meths = 'get post delete put patch options trace head'
 
@@ -23,5 +23,6 @@ class MyFastAPIMeta(type):
     
 
 
-class MyFastAPI(FastAPI, metaclass=MyFastAPIMeta):
-    pass
+class MyFastAPI(FastAPI, metaclass=BaseAPIMeta): ...
+
+class MyAPIRouter(APIRouter, metaclass=BaseAPIMeta): ...
