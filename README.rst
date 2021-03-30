@@ -28,4 +28,4 @@ Examples:
 
     @app.post("/user/", response_model=UserOut)
     def create_user(user: UserIn):
-        return user
+        return UserOut.of(user)
