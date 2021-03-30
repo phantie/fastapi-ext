@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 
+__all__ = ['MyFastAPI']
+
 
 class MyFastAPIMeta(type):
     def __new__(cls, name, bases, attrs):

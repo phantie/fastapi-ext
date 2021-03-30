@@ -9,6 +9,10 @@ if version_info >= (3, 9, 0):
 else:
     from typing import _GenericAlias as GenericAlias
 
+
+__all__ = 'BaseModel', 'DefaultBaseModel'
+
+
 @classmethod
 def of(cls, of, **add): return cls(**of.dict(), **add)
 
