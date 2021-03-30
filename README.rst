@@ -1,5 +1,5 @@
-# my extension of FastAPI/Pydantic
-
+my extension of FastAPI/Pydantic
+-------------------
 
 Examples:
 
@@ -7,22 +7,22 @@ Examples:
 .. code:: python
 
 
-    from mypydantic import Model as BaseModel
+    from mypydantic import Model as DefaultBaseModel
     from myfastapi import MyFastAPI
 
     app = MyFastAPI()
 
-    class UserOut(BaseModel):
+    class UserOut(DefaultBaseModel):
         username: str
-        items: list # equals to `items: ... = []`
-        misc: tuple[str, int, bytes] # equals to `misc: ... = ('', 0, b'')`
+        items: list # equals to `items: list = []`
+        misc: tuple[str, int] # equals to `misc: tuple[str, int] = ('', 0)`
 
     class UserIn(UserOut):
         password: str
 
     @app.post("/user/")
     def create_user(user: UserIn) -> UserOut:
-        return user
+        return UserOut.of(user) # equals to UserOut(**user.dict())
 
     # Equals to
 

@@ -1,12 +1,16 @@
-from mypydantic import BaseModel
+from mypydantic import BaseModel, DefaultBaseModel
 
 from typing import *
 from collections import defaultdict, deque, OrderedDict as ordereddict
 
 import pytest
 
-def test_basic():
-    class User(BaseModel):
+
+models = (BaseModel, DefaultBaseModel)
+
+
+def test_default_basic():
+    class User(DefaultBaseModel):
         username: str
         items: List[str]
         misc: Tuple
@@ -14,9 +18,9 @@ def test_basic():
     user = User(usename = 'phantie')
     assert user.items == [] and user.misc == ()
 
-def test_types():
+def test_default_types():
 
-    class Foo(BaseModel):
+    class Foo(DefaultBaseModel):
         fs: FrozenSet
         t: Tuple
         l: List
@@ -35,9 +39,9 @@ def test_types():
     assert a('dq') == deque()
     assert a('od') == ordereddict()
 
-def test_hinted_types():
+def test_default_hinted_types():
     from collections import deque, defaultdict, OrderedDict
-    class Foo(BaseModel):
+    class Foo(DefaultBaseModel):
         fs: FrozenSet[int]
         t: Tuple[int, str, bytes]
         l: List[float]
@@ -54,3 +58,27 @@ def test_hinted_types():
     assert a('d') == dict()
     assert a('dd') == defaultdict()
     assert a('dq') == deque()
+
+def test_of():
+    for Model in models:
+
+        class BaseUser(Model):
+            name: str
+
+        class User(BaseUser):
+            password: str
+
+        u = BaseUser(name='phantie')
+
+        assert User.of(u, password = 'gibberish') == User(**u.dict(), password = 'gibberish')
+
+
+    for Model in models:
+        class UserOut(Model):
+            username: str
+
+        class UserIn(UserOut):
+            password: str
+
+        user = UserIn(username='phantie')
+        assert UserOut.of(user) == UserOut(**user.dict())

@@ -1,9 +1,11 @@
-from mypydantic import BaseModel
+from mypydantic import BaseModel, DefaultBaseModel
 import pytest
 
+models = (BaseModel, DefaultBaseModel)
 
-def test_basic():
-    class User(BaseModel):
+
+def test_default_basic():
+    class User(DefaultBaseModel):
         username: str
         items: list[str]
         misc: tuple
@@ -11,9 +13,9 @@ def test_basic():
     user = User(usename = 'phantie')
     assert user.items == [] and user.misc == ()
 
-def test_types():
+def test_default_types():
     from collections import deque, defaultdict, OrderedDict
-    class Foo(BaseModel):
+    class Foo(DefaultBaseModel):
         fs: frozenset
         t: tuple
         l: list
@@ -33,9 +35,9 @@ def test_types():
     assert a('od') == OrderedDict()
 
 
-def test_hinted_types():
+def test_default_hinted_types():
     from collections import deque, defaultdict, OrderedDict
-    class Foo(BaseModel):
+    class Foo(DefaultBaseModel):
         fs: frozenset[int]
         t: tuple[int, str, bytes]
         l: list[float]
@@ -53,3 +55,16 @@ def test_hinted_types():
     assert a('dd') == defaultdict()
     assert a('dq') == deque()
     assert a('od') == OrderedDict()
+
+def test_of():
+    for Model in models:
+
+        class BaseUser(Model):
+            name: str
+
+        class User(BaseUser):
+            password: str
+
+        u = BaseUser(name='phantie')
+
+        assert User.of(u, password = 'gibberish') == User(**u.dict(), password = 'gibberish')

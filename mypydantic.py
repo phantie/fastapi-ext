@@ -9,10 +9,14 @@ if version_info >= (3, 9, 0):
 else:
     from typing import _GenericAlias as GenericAlias
 
+@classmethod
+def of(cls, of, **add): return cls(**of.dict(), **add)
+
+PydanticBaseModel.of = of
+
 class BaseMeta(ModelMetaclass):
     def __new__(cls, name, bases, attrs):
         annotations = attrs.get('__annotations__', {})
-
 
         for key in set(annotations).difference(set(attrs)):
             value = annotations[key]
@@ -30,4 +34,7 @@ class BaseMeta(ModelMetaclass):
 
         return super().__new__(cls, cls.__name__, (PydanticBaseModel, object), attrs)
 
-class BaseModel(metaclass=BaseMeta): ...
+
+class BaseModel(PydanticBaseModel): ...
+
+class DefaultBaseModel(metaclass=BaseMeta): ...
