@@ -10,7 +10,7 @@ else:
     from typing import _GenericAlias as GenericAlias
 
 
-__all__ = 'BaseModel', 'DefaultBaseModel'
+__all__ = 'BaseModel', 'DefaultBaseModel', 'ImmutableBaseModel'
 
 
 @classmethod
@@ -42,3 +42,8 @@ class BaseMeta(ModelMetaclass):
 class BaseModel(PydanticBaseModel): ...
 
 class DefaultBaseModel(metaclass=BaseMeta): ...
+
+class ImmutableBaseModel(PydanticBaseModel):
+    class Config:
+        allow_mutation = False
+
