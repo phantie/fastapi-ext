@@ -1,5 +1,6 @@
 from pydantic import BaseModel as PydanticBaseModel
 from pydantic.main import ModelMetaclass
+import orjson
 
 from typing import Union, Optional
 from sys import version_info
@@ -13,12 +14,16 @@ else:
 __all__ = 'BaseModel', 'DefaultBaseModel', 'ImmutableBaseModel'
 
 
-@classmethod
-def of(cls, of, **add): return cls(**of.dict(), **add)
 
-PydanticBaseModel.of = of
+class BaseModel(PydanticBaseModel):
+    @classmethod
+    def of(cls, of, **add): return cls(**of.dict(), **add)
 
-class BaseMeta(ModelMetaclass):
+    class Config:
+        json_loads = orjson.loads
+        json_dumps = lambda v, *, default: orjson.dumps(v, default=default).decode()
+
+class DefaultBaseMeta(ModelMetaclass):
     def __new__(cls, name, bases, attrs):
         annotations = attrs.get('__annotations__', {})
 
@@ -36,14 +41,12 @@ class BaseMeta(ModelMetaclass):
             else:
                 attrs[key] = value()
 
-        return super().__new__(cls, cls.__name__, (PydanticBaseModel, object), attrs)
+        return super().__new__(cls, cls.__name__, (BaseModel, object), attrs)
 
 
-class BaseModel(PydanticBaseModel): ...
+class DefaultBaseModel(metaclass=DefaultBaseMeta): ...
 
-class DefaultBaseModel(metaclass=BaseMeta): ...
 
-class ImmutableBaseModel(PydanticBaseModel):
+class ImmutableBaseModel(BaseModel):
     class Config:
         allow_mutation = False
-
