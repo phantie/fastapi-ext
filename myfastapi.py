@@ -1,5 +1,7 @@
 __all__ = 'MyFastAPI', 'MyAPIRouter'
 
+from tools import responses
+
 from fastapi import FastAPI, APIRouter
 from fastapi.responses import ORJSONResponse
 
@@ -13,13 +15,27 @@ class BaseAPIMeta(type):
                 def wrap(self, path, **kwargs):
                     meth = getattr(super(self.__class__, self), meth_name)
                     def wrap(f):
-                        response_model = (
-                            getattr(f, '__annotations__', {}).get('return', kwargs.pop('response_model', None)))
+                        if ('response_model' in kwargs) + ('response_class' in kwargs) == 2:
+                            raise ValueError('')
+                        elif ('response_model' in kwargs) + ('response_class' in kwargs) == 1 and \
+                             'return' in getattr(f, '__annotations__', {}):
+                            raise ValueError('')
+
+                        response_model_or_class = (
+                            getattr(f, '__annotations__', {})
+                                .get('return', kwargs
+                                    .get('response_model', kwargs
+                                        .get('response_class', 
+                                            ORJSONResponse))))
+
+                        kwargs.__setitem__(
+                            'response_class' if response_model_or_class in responses else 'response_model',
+                            response_model_or_class
+                        )
+
                         return meth(
                                     path,
-                                    **kwargs,
-                                    response_model=response_model,
-                                    response_class=ORJSONResponse)(f)
+                                    **kwargs)(f)
                     return wrap
                 return wrap
 
