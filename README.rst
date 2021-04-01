@@ -12,6 +12,7 @@ Examples:
 
     app = MyFastAPI()
 
+
     class UserOut(DefaultBaseModel):
         username: str
         items: list # equals to `items: list = []`
@@ -19,6 +20,7 @@ Examples:
 
     class UserIn(UserOut):
         password: str
+
 
     @app.post("/user/")
     def create_user(user: UserIn) -> UserOut:
@@ -29,3 +31,16 @@ Examples:
     @app.post("/user/", response_model=UserOut)
     def create_user(user: UserIn):
         return UserOut.of(user)
+
+
+    from fastapi.responses import PlainTextResponse
+
+    @app.get('/plain-text/{text}')
+    def get_plain_text(text: str) -> PlainTextResponse:
+        return PlainTextResponse(content=text, media_type='text/html')
+
+    # Equals to
+
+    @app.get('/plain-text/{text}', response_class = PlainTextResponse)
+    def get_plain_text(text: str):
+        return PlainTextResponse(content=text, media_type='text/html')
