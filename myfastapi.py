@@ -16,10 +16,10 @@ class BaseAPIMeta(type):
                     meth = getattr(super(self.__class__, self), meth_name)
                     def wrap(f):
                         if ('response_model' in kwargs) + ('response_class' in kwargs) == 2:
-                            raise ValueError('')
+                            raise ValueError('don\'t override response_model and response_class at once')
                         elif ('response_model' in kwargs) + ('response_class' in kwargs) == 1 and \
                              'return' in getattr(f, '__annotations__', {}):
-                            raise ValueError('')
+                            raise ValueError('either ambiguity or override')
 
                         response_model_or_class = (
                             getattr(f, '__annotations__', {})
@@ -28,10 +28,11 @@ class BaseAPIMeta(type):
                                         .get('response_class', 
                                             ORJSONResponse))))
 
-                        kwargs.__setitem__(
-                            'response_class' if response_model_or_class in responses else 'response_model',
-                            response_model_or_class
-                        )
+                        if response_model_or_class in responses:
+                            kwargs['response_class'] = response_model_or_class
+                        else:
+                            kwargs['response_model'] = response_model_or_class
+                            kwargs['response_class'] = ORJSONResponse
 
                         return meth(
                                     path,
