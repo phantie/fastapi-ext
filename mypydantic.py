@@ -51,18 +51,3 @@ class DefaultBaseModel(metaclass=DefaultBaseMeta): ...
 class ImmutableBaseModel(BaseModel):
     class Config:
         allow_mutation = False
-
-from pydantic import BaseSettings, Field
-from os import environ
-from pprint import pprint
-
-environ['haha'] = str(20)
-
-class Config(BaseSettings):
-    haha: int = Field(..., env = 'haha')
-    lol: str = 'L O L'
-
-    class Config:
-        env_prefix = ''
-
-# print(Config())
