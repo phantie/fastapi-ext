@@ -15,9 +15,9 @@ class BaseAPIMeta(type):
                 def wrap(self, path, **kwargs):
                     meth = getattr(super(self.__class__, self), meth_name)
                     def wrap(f):
-                        if ('response_model' in kwargs) + ('response_class' in kwargs) == 2:
+                        if 'response_model' in kwargs and 'response_class' in kwargs:
                             raise ValueError('don\'t override response_model and response_class at once')
-                        elif ('response_model' in kwargs) + ('response_class' in kwargs) == 1 and \
+                        elif 'response_model' in kwargs or 'response_class' in kwargs and \
                              'return' in getattr(f, '__annotations__', {}):
                             raise ValueError('either ambiguity or override')
 
