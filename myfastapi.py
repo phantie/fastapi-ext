@@ -1,6 +1,6 @@
-from fastapi import FastAPI, APIRouter
-
 __all__ = 'MyFastAPI', 'MyAPIRouter'
+
+from fastapi import FastAPI, APIRouter
 
 
 class BaseAPIMeta(type):

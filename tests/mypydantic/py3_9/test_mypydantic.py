@@ -1,7 +1,7 @@
-from mypydantic import BaseModel, DefaultBaseModel
+from mypydantic import BaseModel, DefaultBaseModel, ImmutableBaseModel
 import pytest
 
-models = (BaseModel, DefaultBaseModel)
+models = (BaseModel, DefaultBaseModel, ImmutableBaseModel)
 
 
 def test_default_basic():

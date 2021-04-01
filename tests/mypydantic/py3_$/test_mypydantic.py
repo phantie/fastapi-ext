@@ -1,4 +1,4 @@
-from mypydantic import BaseModel, DefaultBaseModel
+from mypydantic import BaseModel, DefaultBaseModel, ImmutableBaseModel
 
 from typing import *
 from collections import defaultdict, deque, OrderedDict as ordereddict
@@ -6,7 +6,7 @@ from collections import defaultdict, deque, OrderedDict as ordereddict
 import pytest
 
 
-models = (BaseModel, DefaultBaseModel)
+models = (BaseModel, DefaultBaseModel, ImmutableBaseModel)
 
 
 def test_default_basic():

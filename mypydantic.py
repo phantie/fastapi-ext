@@ -1,3 +1,8 @@
+__all__ = 'BaseModel', 'DefaultBaseModel', 'ImmutableBaseModel'
+
+# TODO
+#   check copy_on_model_validation
+
 from pydantic import BaseModel as PydanticBaseModel
 from pydantic.main import ModelMetaclass
 import orjson
@@ -9,10 +14,6 @@ if version_info >= (3, 9, 0):
     from types import GenericAlias
 else:
     from typing import _GenericAlias as GenericAlias
-
-
-__all__ = 'BaseModel', 'DefaultBaseModel', 'ImmutableBaseModel'
-
 
 
 class BaseModel(PydanticBaseModel):
@@ -50,3 +51,18 @@ class DefaultBaseModel(metaclass=DefaultBaseMeta): ...
 class ImmutableBaseModel(BaseModel):
     class Config:
         allow_mutation = False
+
+from pydantic import BaseSettings, Field
+from os import environ
+from pprint import pprint
+
+environ['haha'] = str(20)
+
+class Config(BaseSettings):
+    haha: int = Field(..., env = 'haha')
+    lol: str = 'L O L'
+
+    class Config:
+        env_prefix = ''
+
+# print(Config())
