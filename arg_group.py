@@ -1,4 +1,7 @@
-def group_kwargs(f):
+from functools import partial
+
+
+def group_kwargs(f = None, exclude = None, include = None):
     """ Groups parameters passed by keyword, merges with defaults,
         and passes the dict as a first argument to a function
 
@@ -9,13 +12,30 @@ def group_kwargs(f):
         assert foo(bar, baz = 0, c = 42) == {'a':1, 'b': 2, 'c': 42, 'baz': 0}
        """
 
+    assert not (exclude is not None and include is not None)
+
+    if f is None:
+        if exclude is not None:
+            return partial(group_kwargs, exclude = exclude)
+        if include is not None:
+            return partial(group_kwargs, include = include)
+
     def wrap(*args, **kwargs):
         def get_defaults_with_names(f):
             from inspect import signature, _empty, Parameter
-            return dict((name, par.default) for name, par in signature(f).parameters.items() 
+            result = dict((name, par.default) for name, par in signature(f).parameters.items() 
                             if (par.kind == Parameter.POSITIONAL_OR_KEYWORD or
                                 par.kind == Parameter.KEYWORD_ONLY) and
                                 par.default is not _empty)
+
+            if exclude is not None:
+                assert all(ex in result for ex in exclude)
+                result = {k: v for k, v in result.items() if k not in exclude}
+            if include is not None:
+                assert all(ex in result for ex in include)
+                result = {k: v for k, v in result.items() if k in include}
+
+            return result
 
         updated = {**get_defaults_with_names(f), **kwargs}
         return f(updated, *args, **kwargs)
