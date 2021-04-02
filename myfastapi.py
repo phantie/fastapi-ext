@@ -1,10 +1,8 @@
 __all__ = 'MyFastAPI', 'MyAPIRouter'
 
-from tools import responses
 
 from fastapi import FastAPI, APIRouter
-from fastapi.responses import ORJSONResponse
-
+from fastapi.responses import ORJSONResponse, Response, JSONResponse
 
 class BaseAPIMeta(type):
     def __new__(cls, name, bases, attrs):
@@ -17,8 +15,8 @@ class BaseAPIMeta(type):
                     def wrap(f):
                         if 'response_model' in kwargs and 'response_class' in kwargs:
                             raise ValueError('don\'t override response_model and response_class at once')
-                        elif 'response_model' in kwargs or 'response_class' in kwargs and \
-                             'return' in getattr(f, '__annotations__', {}):
+                        elif ('response_model' in kwargs or 'response_class' in kwargs) and \
+                              'return' in getattr(f, '__annotations__', {}):
                             raise ValueError('either ambiguity or override')
 
                         response_model_or_class = (
@@ -28,7 +26,7 @@ class BaseAPIMeta(type):
                                         .get('response_class', 
                                             ORJSONResponse))))
 
-                        if response_model_or_class in responses:
+                        if issubclass(response_model_or_class, Response):
                             kwargs['response_class'] = response_model_or_class
                         else:
                             kwargs['response_model'] = response_model_or_class
