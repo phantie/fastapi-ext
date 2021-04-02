@@ -6,7 +6,7 @@ testing.py
 t.py
 # C extensions
 *.so
-
+run.py
 # Distribution / packaging
 .Python
 build/

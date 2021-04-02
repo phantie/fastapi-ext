@@ -1,6 +1,6 @@
-from pytest import mark
+import pytest
 
-# @mark.slow
+@pytest.mark.skip # TEMP for speed
 def test_availability(app, client):
     @app.get('/')
     def index(): return ''

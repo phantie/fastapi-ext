@@ -1,4 +1,5 @@
 from sys import version_info
+import pytest
 
 def pytest_ignore_collect(path, config):
     if 'py3_9' in str(path):
@@ -8,4 +9,3 @@ def pytest_ignore_collect(path, config):
     if 'py3_$' in str(path):
         if version_info >= (3, 9, 0):
             return True
-    
