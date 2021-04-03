@@ -81,10 +81,7 @@ class MyConfigMeta(ModelMetaclass):
             if name in constants:
                 raise TypeError(
                     f'{name} is constant, '
-                    f'but you tried to override it with {value!r} of type {type(value).__name__!r}' +
-                   (f' \n(check env variable {name!r} [case insensitive], it tries to override this constant)' 
-                        if (env_var := getenv(name, None)) is not None
-                        else ''))
+                    f'but you tried to override it with {value!r} of type {type(value).__name__!r}')
             else:
                 return super(BaseSettings, self).__setattr__(name, value)
 
