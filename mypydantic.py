@@ -96,11 +96,11 @@ class MyConfigMeta(ModelMetaclass):
 class BaseConfig(BaseSettings, metaclass = MyConfigMeta):
     def __init__(self, *args, allow_env_vars_override_constants = False, **kwargs):
         from os import environ
-
-        super().__init__(*args, **kwargs)
         if not allow_env_vars_override_constants and \
             (will_override := {_ for _ in self.__constants__ if _ in environ}):
                 raise RuntimeError(f'env vars try to override constants: {", ".join(will_override)}')
+
+        super().__init__(*args, **kwargs)
 
     class Config:
         validate_all = True
