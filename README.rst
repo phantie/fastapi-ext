@@ -44,3 +44,9 @@ Examples:
     @app.get('/plain-text/{text}', response_class = PlainTextResponse)
     def get_plain_text(text: str):
         return PlainTextResponse(content=text, media_type='text/html')
+
+    class Config(BaseConfig):
+        some_constant: const[int] = 21
+
+    with raises(TypeError):
+        Config().some_constant = 42 # because it's constant
