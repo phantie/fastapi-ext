@@ -8,8 +8,9 @@ from pydantic.main import ModelMetaclass
 import orjson
 
 from typing import Union, Optional, Generic, TypeVar, get_args
-
 from sys import version_info
+from os import getenv
+
 
 if version_info >= (3, 9, 0):
     from types import GenericAlias
@@ -59,6 +60,7 @@ class const(Generic[T]): ...
 
 class MyConfigMeta(ModelMetaclass):
     def __new__(cls, name, bases, attrs):
+
         def is_const(annotation):
             return getattr(annotation, '__origin__', None) is const
 
@@ -66,6 +68,9 @@ class MyConfigMeta(ModelMetaclass):
             return get_args(annotation)[0]
 
         constants = set()
+
+        assert all(k in attrs for k, v in attrs.get('__annotations__', {}).items()
+            if is_const(v)), 'you can\'t mark a field with no value as constant'
 
         for name, value in attrs.get('__annotations__', {}).items():
             if is_const(value):
@@ -76,7 +81,10 @@ class MyConfigMeta(ModelMetaclass):
             if name in constants:
                 raise TypeError(
                     f'{name} is constant, '
-                    f'but you tried to override it with {value!r} of type {type(value).__name__!r}')
+                    f'but you tried to override it with {value!r} of type {type(value).__name__!r}' +
+                   (f' \n(check env variable {name!r} [case insensitive], it tries to override this constant)' 
+                        if (env_var := getenv(name, None)) is not None
+                        else ''))
             else:
                 return super(BaseSettings, self).__setattr__(name, value)
 

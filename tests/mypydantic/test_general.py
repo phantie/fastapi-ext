@@ -37,9 +37,9 @@ def test_my_config_const():
     ###
 
     class Config(BaseConfig):
-        username = 'phantie'
+        username: str = 'phantie'
         password: const[int] = 21
-        
+
 
     config = Config()
 
