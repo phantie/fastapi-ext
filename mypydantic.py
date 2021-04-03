@@ -89,10 +89,22 @@ class MyConfigMeta(ModelMetaclass):
                 return super(BaseSettings, self).__setattr__(name, value)
 
         attrs['__setattr__'] = __setattr__
+        attrs['__constants__'] = constants
 
         return super().__new__(cls, cls.__name__, bases, attrs)
 
 class BaseConfig(BaseSettings, metaclass = MyConfigMeta):
+    def __init__(self, *args, allow_env_vars_override_constants = False, **kwargs):
+        from os import environ
+
+        super().__init__(*args, **kwargs)
+
+        try:
+            assert not (will_override := {_.lower() for _ in self.__constants__ if _.lower() in environ})
+        except AssertionError:
+            if not allow_env_vars_override_constants:
+                raise RuntimeError(f'env vars try to override constants: {", ".join(will_override)}')
+
     class Config:
         validate_all = True
         validate_assignment = True

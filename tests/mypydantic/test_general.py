@@ -33,23 +33,27 @@ def test_json():
 def test_my_config_const():
     ### to make the test stable
     from os import environ
-    environ['username'] = 'phantie'
+    environ['username'] = 'joojoo'
     ###
 
     class Config(BaseConfig):
-        username: str = 'phantie'
+        username: const[str] = 'phantie'
         password: const[int] = 21
 
+    assert hasattr(Config, '__constants__')
 
-    config = Config()
+    with pytest.raises(RuntimeError):
+        config = Config(allow_env_vars_override_constants=False)
 
-    assert config.username == 'phantie' and config.password == 21
+    config = Config(allow_env_vars_override_constants=True)
 
+    assert config.username == 'joojoo' and config.password == 21
 
-    config.username = 'povar'
     with pytest.raises(TypeError) as err:
         config.password = 13
-
+    assert 'is constant' in err.value.args[0]
+    with pytest.raises(TypeError) as err:
+        config.username = 'povar'
     assert 'is constant' in err.value.args[0]
 
-    assert config.username == 'povar' and config.password == 21
+    assert config.username == 'joojoo' and config.password == 21
