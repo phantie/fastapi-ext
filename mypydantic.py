@@ -98,11 +98,8 @@ class BaseConfig(BaseSettings, metaclass = MyConfigMeta):
         from os import environ
 
         super().__init__(*args, **kwargs)
-
-        try:
-            assert not (will_override := {_.lower() for _ in self.__constants__ if _.lower() in environ})
-        except AssertionError:
-            if not allow_env_vars_override_constants:
+        if not allow_env_vars_override_constants and \
+            (will_override := {_ for _ in self.__constants__ if _ in environ}):
                 raise RuntimeError(f'env vars try to override constants: {", ".join(will_override)}')
 
     class Config:
