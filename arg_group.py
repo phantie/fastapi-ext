@@ -1,7 +1,10 @@
-from functools import partial
+__all__ = 'group_kwargs',
 
 
-def group_kwargs(f = None, exclude = None, include = None):
+from functools import partial, wraps
+from inspect import signature
+
+def group_kwargs(f = None, /, exclude = None, include = None):
     """ Groups parameters passed by keyword, merges with defaults,
         and passes the dict as a first argument to a function
 
@@ -20,6 +23,7 @@ def group_kwargs(f = None, exclude = None, include = None):
         if include is not None:
             return partial(group_kwargs, include = include)
 
+    @wraps(f)
     def wrap(*args, **kwargs):
         def get_defaults_with_names(f):
             from inspect import signature, _empty, Parameter
@@ -39,4 +43,8 @@ def group_kwargs(f = None, exclude = None, include = None):
 
         updated = {**get_defaults_with_names(f), **kwargs}
         return f(updated, *args, **kwargs)
+
+    sig = signature(f)
+    wrap.__signature__ = sig.replace(parameters=tuple(sig.parameters.values())[1:])
+
     return wrap
