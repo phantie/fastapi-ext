@@ -1,4 +1,4 @@
-__all__ = 'BaseModel', 'DefaultBaseModel', 'ImmutableBaseModel', 'BaseConfig', 'const'
+__all__ = 'BaseModel', 'DefaultBaseModel', 'ImmutableBaseModel', 'BaseConfig'
 
 # TODO
 #   check copy_on_model_validation
@@ -53,44 +53,25 @@ class ImmutableBaseModel(BaseModel):
     class Config:
         allow_mutation = False
 
-
-T = TypeVar('T')
-
-class const(Generic[T]): ...
-
 class MyConfigMeta(ModelMetaclass):
     def __new__(cls, name, bases, attrs):
+        from pydantic import Field
+        Field = type(Field())
 
         def is_const(annotation):
-            return getattr(annotation, '__origin__', None) is const
+            return isinstance(annotation, Field) and not annotation.allow_mutation
 
-        def inner_type(annotation):
-            return get_args(annotation)[0]
+        attrs['__constants__'] = {name for name, value in attrs.items() if is_const(value)}
 
-        constants = set()
-
-        assert all(k in attrs for k, v in attrs.get('__annotations__', {}).items()
-            if is_const(v)), 'you can\'t mark a field with no value as constant'
-
-        for name, value in attrs.get('__annotations__', {}).items():
-            if is_const(value):
-                constants.add(name)
-                attrs['__annotations__'][name] = inner_type(value)
-
-        def __setattr__(self, name, value):
-            if name in constants:
-                raise TypeError(
-                    f'{name} is constant, '
-                    f'but you tried to override it with {value!r} of type {type(value).__name__!r}')
-            else:
-                return super(BaseSettings, self).__setattr__(name, value)
-
-        attrs['__setattr__'] = __setattr__
-        attrs['__constants__'] = constants
-
-        return super().__new__(cls, cls.__name__, bases, attrs)
+        return super().__new__(cls, name, bases, attrs)
 
 class BaseConfig(BaseSettings, metaclass = MyConfigMeta):
+    """
+    Customized, more robust version of BaseSettings.
+        Prevents silent bugs when 'allow_mutation' == False
+        but env. vars try to override any of them.
+    """
+
     def __init__(self, *args, allow_env_vars_override_constants = False, **kwargs):
         from os import environ
         if not allow_env_vars_override_constants and \

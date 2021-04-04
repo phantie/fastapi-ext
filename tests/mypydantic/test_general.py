@@ -31,14 +31,15 @@ def test_json():
             PydanticUser(name=name, age=age).json().replace(': ', ':').replace(', ', ',')
 
 def test_my_config_const():
+    from pydantic import Field
     ### to make the test stable
     from os import environ
     environ['username'] = 'joojoo'
     ###
 
     class Config(BaseConfig):
-        username: const[str] = 'phantie'
-        password: const[int] = 21
+        username: str = Field('phantie', allow_mutation = False)
+        password: int = Field(21, allow_mutation = False)
 
     assert hasattr(Config, '__constants__')
 
@@ -51,9 +52,7 @@ def test_my_config_const():
 
     with pytest.raises(TypeError) as err:
         config.password = 13
-    assert 'is constant' in err.value.args[0]
     with pytest.raises(TypeError) as err:
         config.username = 'povar'
-    assert 'is constant' in err.value.args[0]
 
     assert config.username == 'joojoo' and config.password == 21

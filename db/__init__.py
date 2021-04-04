@@ -1,9 +1,10 @@
 import sqlalchemy as sa
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, declarative_base
 
-DB_URL = 'mysql+mysqldb://root:1@localhost/rat'
-engine = create_engine(DB_URL)
+from db.config import config
+
+engine = create_engine(config.db_url)
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
@@ -15,3 +16,7 @@ def get_db():
         yield db
     finally:
         db.close()
+
+import models
+
+Base.metadata.create_all(bind=engine)
