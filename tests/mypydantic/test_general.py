@@ -45,7 +45,6 @@ def test_my_config_const():
         username: str = Field('phantie', allow_mutation = False)
         password: int = Field(21, allow_mutation = False)
 
-    assert hasattr(Config, '__constants__')
 
     with pytest.raises(RuntimeError):
         config = Config(allow_env_vars_override_constants=False)

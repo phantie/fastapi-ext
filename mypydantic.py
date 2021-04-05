@@ -56,20 +56,18 @@ class ImmutableBaseModel(BaseModel):
 
 class MyConfigMeta(ModelMetaclass):
     def __new__(cls, name, bases, attrs):
-        from pydantic import Field
-        Field = type(Field())
+        from pydantic.fields import FieldInfo as FieldType
 
         def const(annotation):
-            return isinstance(annotation, Field) and not annotation.allow_mutation
+            return isinstance(annotation, FieldType) and not annotation.allow_mutation
 
-        def unset_const(annotation):
+        def set_const(annotation):
             from pydantic.fields import Undefined
-            return annotation.default is Undefined or annotation.default is ...
+            return not (annotation.default is Undefined or annotation.default is ...)
 
-        attrs['__constants__'] = {name for name, value in attrs.items() if const(value)}
-        attrs['__unset_constants__'] = {
+        attrs['__constants_with_default__'] = {
             name for name, value in attrs.items()
-            if const(value) and unset_const(value)}
+            if const(value) and set_const(value)}
 
         return super().__new__(cls, name, bases, attrs)
 
@@ -83,9 +81,7 @@ class BaseConfig(BaseSettings, metaclass = MyConfigMeta):
     def __init__(self, *args, allow_env_vars_override_constants = False, **kwargs):
         from os import environ
         if not allow_env_vars_override_constants and \
-            (will_override := {
-                const for const in self.__constants__.difference(self.__unset_constants__)
-                if const in environ}):
+            (will_override := {const for const in self.__constants_with_default__ if const in environ}):
                 raise RuntimeError(f'env vars try to override constants: {", ".join(will_override)}')
 
         super().__init__(*args, **kwargs)
