@@ -45,7 +45,6 @@ def test_my_config_const():
 
     with pytest.raises(RuntimeError):
         config = Config(allow_env_vars_override_constants=False)
-
     config = Config(allow_env_vars_override_constants=True)
 
     assert config.username == 'joojoo' and config.password == 21
@@ -55,4 +54,25 @@ def test_my_config_const():
     with pytest.raises(TypeError) as err:
         config.username = 'povar'
 
+
     assert config.username == 'joojoo' and config.password == 21
+
+def test_my_config_const_with_unset():
+    from pydantic import Field
+    ### to make the test stable
+    from os import environ
+    environ['not_yet_set'] = '100'
+    ###
+
+    class Config(BaseConfig):
+        not_yet_set: str = Field(..., allow_mutation=False)
+        # it allows env vars to override this value without panicking
+
+    config = Config()
+
+    assert config.not_yet_set == '100'
+
+    with pytest.raises(TypeError) as err:
+        config.not_yet_set = '1001'
+
+    assert config.not_yet_set == '100'
