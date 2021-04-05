@@ -101,3 +101,20 @@ def test_subconfigs():
         config.mailing.domain = 'api.hooli.inc'
 
     assert config.mailing.rand == False and config.mailing.domain == 'mail.google.com'
+
+@pytest.mark.skipif('password' in environ or 'user' in environ or 'tmp' not in environ,
+    reason='Depends on env var')
+def test_immut_config():
+    class Config(ImmutableConfig):
+        password = '42' * 42
+        user = 'AaA'
+        tmp: str
+
+    config = Config()
+
+    with pytest.raises(TypeError):
+        config.password = 'super'
+    with pytest.raises(TypeError):
+        config.user = 'root'
+    with pytest.raises(TypeError):
+        config.tmp = '~/.ssh/'

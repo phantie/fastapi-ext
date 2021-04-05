@@ -1,4 +1,4 @@
-__all__ = 'BaseModel', 'DefaultBaseModel', 'ImmutableBaseModel', 'BaseConfig', 'Const'
+__all__ = 'BaseModel', 'DefaultBaseModel', 'ImmutableBaseModel', 'BaseConfig', 'Const', 'ImmutableConfig'
 
 # TODO
 #   check copy_on_model_validation
@@ -56,9 +56,8 @@ class ImmutableBaseModel(BaseModel):
 
 class MyConfigMeta(ModelMetaclass):
     def __new__(cls, name, bases, attrs):
-        from pydantic.fields import FieldInfo as FieldType
-
         def const(annotation):
+            from pydantic.fields import FieldInfo as FieldType
             return isinstance(annotation, FieldType) and not annotation.allow_mutation
 
         def set_const(annotation):
@@ -92,3 +91,10 @@ class BaseConfig(BaseSettings, metaclass = MyConfigMeta):
         arbitrary_types_allowed = True
 
 Const = partial(Field, allow_mutation=False)
+
+class ImmutableConfig(BaseSettings):
+    class Config:
+        allow_mutation = False
+        validate_all = True
+        validate_assignment = True
+        arbitrary_types_allowed = True
