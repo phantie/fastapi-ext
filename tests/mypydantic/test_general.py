@@ -1,6 +1,9 @@
 from mypydantic import *
 
+from os import environ
+
 import pytest
+
 
 def test_immut():
     class User(ImmutableBaseModel):
@@ -30,6 +33,7 @@ def test_json():
         assert User(name=name, age=age).json() == \
             PydanticUser(name=name, age=age).json().replace(': ', ':').replace(', ', ',')
 
+@pytest.mark.skipif('password' in environ, reason='Depends on env var')
 def test_my_config_const():
     from pydantic import Field
     ### to make the test stable
@@ -76,3 +80,25 @@ def test_my_config_const_with_unset():
         config.not_yet_set = '1001'
 
     assert config.not_yet_set == '100'
+
+@pytest.mark.skipif(any(var in environ for var in ('rand', 'domain', 'port', 'secret')),
+    reason='Depends on env vars')
+def test_subconfigs():
+
+    class SubConfig(BaseConfig):
+        domain: str = Const('mail.google.com')
+        port: int = Const(123)
+        rand: bool = True
+
+    class Config(BaseConfig):
+        secret: str = Const('SECRET')
+
+        mailing = SubConfig()
+
+    config = Config()
+
+    config.mailing.rand = False
+    with pytest.raises(TypeError):
+        config.mailing.domain = 'api.hooli.inc'
+
+    assert config.mailing.rand == False and config.mailing.domain == 'mail.google.com'

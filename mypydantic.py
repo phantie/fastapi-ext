@@ -1,15 +1,16 @@
-__all__ = 'BaseModel', 'DefaultBaseModel', 'ImmutableBaseModel', 'BaseConfig'
+__all__ = 'BaseModel', 'DefaultBaseModel', 'ImmutableBaseModel', 'BaseConfig', 'Const'
 
 # TODO
 #   check copy_on_model_validation
 
-from pydantic import BaseModel as PydanticBaseModel, BaseSettings
+from pydantic import BaseModel as PydanticBaseModel, BaseSettings, Field
 from pydantic.main import ModelMetaclass
 import orjson
 
 from typing import Union, Optional, Generic, TypeVar, get_args
 from sys import version_info
 from os import getenv
+from functools import partial
 
 
 if version_info >= (3, 9, 0):
@@ -93,3 +94,5 @@ class BaseConfig(BaseSettings, metaclass = MyConfigMeta):
         validate_all = True
         validate_assignment = True
         arbitrary_types_allowed = True
+
+Const = partial(Field, allow_mutation=False)
