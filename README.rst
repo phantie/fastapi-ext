@@ -7,16 +7,14 @@ Examples:
 .. code:: python
 
 
-    from mypydantic import Model as DefaultBaseModel
-    from myfastapi import MyFastAPI
+    from mypydantic import BaseModel
+    from myfastapi import FastAPI
 
-    app = MyFastAPI()
+    app = FastAPI()
 
 
-    class UserOut(DefaultBaseModel):
+    class UserOut(BaseModel):
         username: str
-        items: list # equals to `items: list = []`
-        misc: tuple[str, int] # equals to `misc: tuple[str, int] = ('', 0)`
 
     class UserIn(UserOut):
         password: str

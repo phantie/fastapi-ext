@@ -1,4 +1,4 @@
-__all__ = 'MyFastAPI', 'MyAPIRouter'
+__all__ = 'FastAPI', 'APIRouter'
 
 
 from fastapi import FastAPI, APIRouter
@@ -43,6 +43,6 @@ class BaseAPIMeta(type):
     
 
 
-class MyFastAPI(FastAPI, metaclass=BaseAPIMeta): ...
+class FastAPI(FastAPI, metaclass=BaseAPIMeta): ...
 
-class MyAPIRouter(APIRouter, metaclass=BaseAPIMeta): ...
+class APIRouter(APIRouter, metaclass=BaseAPIMeta): ...

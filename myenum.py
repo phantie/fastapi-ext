@@ -3,7 +3,7 @@ __all__ = 'UniqueEnum',
 from enum import Enum, EnumMeta
 
 
-class MyEnumMeta(EnumMeta):
+class UniqueEnumMeta(EnumMeta):
     def __new__(cls, name, bases, attrs):
         from tools import unique_seq
 
@@ -13,4 +13,4 @@ class MyEnumMeta(EnumMeta):
             raise ValueError(f"duplicate values found in <enum '{name}'>")
         return new_class
 
-class UniqueEnum(Enum, metaclass=MyEnumMeta): ...
+class UniqueEnum(Enum, metaclass=UniqueEnumMeta): ...

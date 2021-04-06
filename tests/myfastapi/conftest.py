@@ -2,8 +2,8 @@ import pytest
 
 @pytest.fixture(scope='function')
 def app():
-    from myfastapi import MyFastAPI
-    return MyFastAPI()
+    from myfastapi import FastAPI
+    return FastAPI()
 
 @pytest.fixture(scope='function')
 def client(app):

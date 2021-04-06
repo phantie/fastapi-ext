@@ -6,7 +6,7 @@ from os.path import join, dirname
 
 setup(
     author = 'phantie',
-    name = 'web_ext',
-    version = '0.1',
+    name = 'fullmix',
+    version = '0.2',
     packages = find_packages()
 )

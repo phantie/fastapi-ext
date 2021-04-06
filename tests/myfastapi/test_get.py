@@ -1,6 +1,6 @@
 import pytest
 
-@pytest.mark.skip # TEMP for speed
+@pytest.mark.skip(reason='TEMP for speed')
 def test_availability(app, client):
     @app.get('/')
     def index(): return ''
