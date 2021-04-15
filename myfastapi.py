@@ -31,6 +31,10 @@ class BaseAPIMeta(type):
                         kwargs['response_model'] = response_model_or_class
                         kwargs['response_class'] = ORJSONResponse
 
+                    responses = kwargs.get('responses', {})
+
+                    if responses and not isinstance(responses, dict):
+                        kwargs['responses'] = responses.to_response_fmt()
                     return meth(path, **kwargs)(f)
                 return wrap
             return wrap
@@ -38,7 +42,6 @@ class BaseAPIMeta(type):
         attrs.update({meth_name: generate_method(meth_name) for meth_name in meths.split()})
 
         return super().__new__(cls, name, bases, attrs)
-    
 
 
 class FastAPI(FastAPI, metaclass=BaseAPIMeta): ...
