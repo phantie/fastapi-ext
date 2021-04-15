@@ -1,6 +1,6 @@
 from collections import defaultdict
 
-from pydantic import ImmutableBaseModel as Model
+from mypydantic import ImmutableBaseModel as Model
 from pydantic import Field, PositiveInt, validator
 from pydantic.main import ModelMetaclass
 
