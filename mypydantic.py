@@ -13,12 +13,6 @@ from os import getenv
 from functools import partial
 
 
-if version_info >= (3, 9, 0):
-    from types import GenericAlias
-else:
-    from typing import _GenericAlias as GenericAlias
-
-
 class BaseModel(PydanticBaseModel):
     @classmethod
     def of(cls, of, **add): return cls(**of.dict(), **add)
