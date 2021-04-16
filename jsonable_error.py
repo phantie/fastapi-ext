@@ -40,9 +40,9 @@ class ErrorResponseList(list):
         
         if http_code in self._arleady_used_codes:
             raise ValueError('set of errors responses must not have duplicate http codes underneath')
-        
-        self._arleady_used_codes.append(http_code)
-        self._arleady_used_names.append(el.__name__)
+
+        self._arleady_used_codes.add(http_code)
+        self._arleady_used_names.add(el.__name__)
         super().append(el)
 
     def __or__(self, another):
@@ -55,7 +55,10 @@ class ErrorResponseList(list):
 
 class ErrorMeta(ModelMetaclass):
     def __or__(cls, another):
-        return ErrorResponseList((cls, another))
+        composite = ErrorResponseList()
+        composite.append(cls)
+        composite.append(another)
+        return composite
 
     def __repr__(cls):
         return f"ErrorResponse({cls.__fields__['error'].default})"
